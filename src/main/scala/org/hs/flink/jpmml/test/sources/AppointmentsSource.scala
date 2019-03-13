@@ -1,5 +1,8 @@
 package org.hs.flink.jpmml.test.sources
 
+import java.util.UUID
+
+import io.radicalbit.flink.pmml.scala.models.core.ModelId
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
 import org.hs.flink.jpmml.test.model.Appointments
@@ -7,6 +10,12 @@ import org.hs.flink.jpmml.test.model.Appointments
 import scala.util.Random
 
 object AppointmentsSource {
+
+  private final lazy val idSet = Set(
+    "4897c9f4-5226-43c7-8f2d-f9fd388cf2bc",
+    "5f919c52-2ef8-4ff2-94b2-2e64bb85005e"
+  )
+
   private final val NumberOfParameters = 4
   private final lazy val RandomGenerator = scala.util.Random
   private final val RandomMin = 0.2
@@ -30,28 +39,26 @@ object AppointmentsSource {
 
   @throws(classOf[Exception])
   def appointmentSource(env: StreamExecutionEnvironment, availableModelIdOp: Option[Seq[String]]): DataStream[Appointments] = {
-    env.addSource((sc: SourceContext[Appointments]) => {
+    env.addSource(
+      (sc: SourceContext[Appointments]) => {
       while (true) {
-        def randomPostcode: Double =  (1000 + RandomGenerator.nextInt((9999 - 1000)+1)).toDouble
-        def randomAmount : Double = (anomaly  + RandomGenerator.nextInt(6)).toDouble
-        def randomDay: Double = (1 + RandomGenerator.nextInt(28)).toDouble
-        def randomMonth: Double = (1 + RandomGenerator.nextInt(12)).toDouble
+        def randomPostcode: Float =  (1000 + RandomGenerator.nextInt((9999 - 1000)+1)).toFloat
+        def randomAmount : Float = (anomaly  + RandomGenerator.nextInt(6)).toFloat
+        def randomDay: Float = (1 + RandomGenerator.nextInt(28)).toFloat
+        def randomMonth: Float = (1 + RandomGenerator.nextInt(12)).toFloat
 
-        /*
         val appointments =
-          Appointments(Random.nextInt(2).toString,
+          Appointments(idSet.toVector(0) + ModelId.separatorSymbol + "1",
                randomDay,
                randomMonth,
                randomPostcode,
                randomAmount,
                System.currentTimeMillis())
-               */
-        val appointments = Appointments(1.toString,1,1,1011,randomAmount,System.currentTimeMillis())
         sc.collect(appointments)
-        Thread.sleep(1000)
+        Thread.sleep(10000)
       }
-    })
-
+    }
+    )
   }
 
 }

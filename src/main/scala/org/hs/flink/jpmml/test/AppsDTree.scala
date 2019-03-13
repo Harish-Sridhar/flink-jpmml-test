@@ -10,7 +10,7 @@ object AppsDTree {
     implicit val env = StreamExecutionEnvironment.getExecutionEnvironment
     val appsDataStream = appointmentSource(env, None)
 
-    val (inputModel, output) = ("src/main/resources/DecisionTreeLotte4PC.pmml","src/main/resources/kmeans.txt")
+    val (inputModel, output) = ("src/main/resources/DecisionTreeLotte4PC.xml","src/main/resources/kmeans.txt")
 
     //Load model
     val modelReader = ModelReader(inputModel)
